@@ -10,9 +10,11 @@
     <div class="eam-attendance-container">
         <div class="eam-attendance-card">
             <div class="eam-logo">
-                <img src="<?php echo plugins_url('logo-4.png', EAM_PLUGIN_DIR); ?>" 
-         alt="MedLink Analytics" 
-         style="max-width: 200px; height: auto;">
+                <?php if (has_custom_logo()) : ?>
+                    <?php the_custom_logo(); ?>
+                <?php else : ?>
+                    <h1><?php bloginfo('name'); ?></h1>
+                <?php endif; ?>
             </div>
             
             <h2 class="eam-title"><?php _e('Employee Attendance System', 'employee-attendance'); ?></h2>

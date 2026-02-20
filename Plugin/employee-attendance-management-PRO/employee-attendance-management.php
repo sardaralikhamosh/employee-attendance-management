@@ -69,6 +69,10 @@ class Employee_Attendance_Management {
         add_action('wp_ajax_nopriv_eam_checkout', array($this, 'ajax_checkout'));
         add_action('wp_ajax_eam_get_status', array($this, 'ajax_get_status'));
         add_action('wp_ajax_nopriv_eam_get_status', array($this, 'ajax_get_status'));
+
+        // Nonce refresh endpoint — registered here (not inside plugins_loaded)
+        // so it is guaranteed to be available for every admin AJAX call.
+        add_action('wp_ajax_eam_get_nonce', array($this, 'ajax_get_nonce'));
         
         // Custom rewrite rules for /attendance
         add_action('init', array($this, 'add_rewrite_rules'));
@@ -262,6 +266,19 @@ class Employee_Attendance_Management {
         wp_send_json($result);
     }
     
+    /**
+     * Returns a fresh nonce via AJAX.
+     * Registered directly in __construct() so it fires regardless of
+     * plugins_loaded timing — fixes "action not found / HTTP 400" on cached pages.
+     */
+    public function ajax_get_nonce() {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+            return;
+        }
+        wp_send_json_success(array('nonce' => wp_create_nonce('eam_admin_nonce')));
+    }
+
     public function ajax_get_status() {
         check_ajax_referer('eam_frontend_nonce', 'nonce');
         
